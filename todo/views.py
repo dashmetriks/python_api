@@ -172,9 +172,11 @@ class PlayersView(APIView):
 class GameWeekView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def get(self, request, game_id,week_nbr):
         """ Get all todos """
-        players = GameWeek.objects.all()
+        players = GameWeek.objects.filter(game=game_id,week=week_nbr)
+        #players = GameWeek.objects.all()
+        #todos = Player.objects.filter(game=game_id)
         #players = GameWeek.objects.filter(owner=request.user.id)
         serializer = GameWeekSerializer2(players, many=True)
         return Response(serializer.data)
