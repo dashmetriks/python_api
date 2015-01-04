@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.core.mail import send_mail
 
 
 # Django
@@ -167,6 +168,7 @@ class PlayersView(APIView):
             t = Player(owner=owner, game=game1)
             t.save()
             request.DATA['id'] = t.pk # return id
+            send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
 class GameWeekView(APIView):
