@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.core.mail import send_mail
+from nexmomessage import NexmoMessage
 
 
 # Django
@@ -18,8 +19,8 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameWeekSerializer,GameWeekSerializer2
-from todo.models import Todo, Game, Player, GameWeek
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameWeekSerializer,GameWeekSerializer2, UserProfileSerializer
+from todo.models import Todo, Game, Player, GameWeek, UserProfile
 
 
 def index(request):
@@ -169,6 +170,13 @@ class PlayersView(APIView):
             t.save()
             request.DATA['id'] = t.pk # return id
             send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
+            msg = {
+		    	'reqtype': 'json',
+    			'text': 'Hello world!'
+			}
+            sms = NexmoMessage(msg)
+ 	    sms.set_text_info(msg['text'])
+            sms.send_request()
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
 class GameWeekView(APIView):
@@ -199,3 +207,44 @@ class GameWeekView(APIView):
             t.save()
             request.DATA['id'] = t.pk # return id
             return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+class UserProfileView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """ Get all todos """
+        todos = UserProfile.objects.filter(user=request.user.id)
+        #serializer = UserProfileSerializer(todos, many=True)
+        serializer = UserProfileSerializer(todos)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """ Adding a new todo. """
+        serializer = UserProfileSerializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            t = UserProfile(user=user, city=data['city'],  phone=data['phone'])
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+    def put(self, request, todo_id):
+        """ Update a todo """
+        serializer = TodoSerializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            desc = data['description']
+            done = data['done']
+            t = Todo(id=todo_id, owner=request.user, description=desc,\
+                     done=done, updated=datetime.now())
+            t.save()
+            return Response(status=status.HTTP_200_OK)
+

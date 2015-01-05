@@ -13,6 +13,7 @@ urlpatterns = patterns('',
    # url(r'^gameweek/$', views.GameWeekView.as_view()),
     url(r'^gameweek/(?P<game_id>[0-9]*)/(?P<week_nbr>[0-9]*)$', views.GameWeekView.as_view()),
     url(r'^todos/$', views.TodosView.as_view()),
+    url(r'^user/$', views.UserProfileView.as_view()),
     url(r'^todos/(?P<todo_id>[0-9]*)$', views.TodosView.as_view()),
     url(r'^games/(?P<game_id>[0-9]*)$', views.GamesPlayerView.as_view()),
 

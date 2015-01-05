@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from todo.models import Todo, Game, Player, GameWeek
+from todo.models import Todo, Game, Player, GameWeek, UserProfile
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -55,3 +55,8 @@ class GameWeekSerializer2(serializers.ModelSerializer):
     class Meta:
         model = GameWeek
         fields = ('id', 'game','week', 'inorout', 'users') 
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('gender', 'city','phone') 
