@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from todo.models import Todo, Game, Player, GameWeek, UserProfile
+from todo.models import Todo, Game, Player, GameUsers, UserProfile
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -44,17 +44,17 @@ class GamesPlayerSerializer(serializers.ModelSerializer):
         model = Player
         fields = ('game','users') 
 
-class GameWeekSerializer(serializers.ModelSerializer):
-    #users = UserSerializer(source='owner')
+class GameUsersSerializer(serializers.ModelSerializer):
+  #  user = UserSerializer(source='owner')
     class Meta:
-        model = GameWeek
-        fields = ('id', 'game','week', 'inorout') 
+        model = GameUsers
+        fields = ( 'game_id', 'gstatus') 
 
-class GameWeekSerializer2(serializers.ModelSerializer):
-    users = UserSerializer(source='owner')
+class GameUsersSerializer2(serializers.ModelSerializer):
+    users = UserSerializer(source='user')
     class Meta:
-        model = GameWeek
-        fields = ('id', 'game','week', 'inorout', 'users') 
+        model = GameUsers
+        fields = ('game_id','gstatus', 'user', 'users') 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:

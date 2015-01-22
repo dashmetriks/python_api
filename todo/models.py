@@ -18,11 +18,10 @@ class Player(models.Model):
     owner = models.ForeignKey(User)
     game = models.ForeignKey(Game)
    
-class GameWeek(models.Model):
-    owner = models.ForeignKey(User)
-    game = models.ForeignKey(Game)
-    week = models.CharField(max_length=30)
-    inorout = models.CharField(max_length=30)
+class GameUsers(models.Model):
+    user = models.ForeignKey(User)
+    game_id = models.ForeignKey(Game)
+    gstatus = models.CharField(max_length=30)
     #game = models.CharField(max_length=30)
 #    description = models.CharField(max_length=30)
 #    done = models.BooleanField()
@@ -33,7 +32,7 @@ class UserProfile(models.Model):
             ('male', 'Male'),
             ('female', 'Female')
         )
-        user = models.OneToOneField(User, unique=True)
+        user = models.OneToOneField(User)
         gender = models.CharField(max_length=20, null=True, blank=True,
                                   choices=GENDERS)
         city = models.CharField(max_length=250, null=True, blank=True)

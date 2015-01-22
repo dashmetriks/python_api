@@ -19,13 +19,16 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameWeekSerializer,GameWeekSerializer2, UserProfileSerializer
-from todo.models import Todo, Game, Player, GameWeek, UserProfile
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer
+from todo.models import Todo, Game, Player, GameUsers, UserProfile
 
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+def send_group_mail():
+    # print "Hello"
+    send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -169,41 +172,49 @@ class PlayersView(APIView):
             t = Player(owner=owner, game=game1)
             t.save()
             request.DATA['id'] = t.pk # return id
-            send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
+            send_group_mail()
+            #send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
             msg = {
 		    	'reqtype': 'json',
+    	     	    	'api_key': '60215e70',
+    			'api_secret': 'a885b16f',
+    			'from': '12132633411',
+    			'to':'14157865548',
     			'text': 'Hello world!'
 			}
             sms = NexmoMessage(msg)
- 	    sms.set_text_info(msg['text'])
-            sms.send_request()
+ 	    #sms.set_text_info(msg['text'])
+            #sms.send_request()
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
-class GameWeekView(APIView):
-    permission_classes = (IsAuthenticated,)
+class GameUsersView(APIView):
+#    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
-    def get(self, request, game_id,week_nbr):
+    def get(self, request, game_id):
         """ Get all todos """
-        players = GameWeek.objects.filter(game=game_id,week=week_nbr)
+        players = GameUsers.objects.filter(game_id=game_id)
         #players = GameWeek.objects.all()
         #todos = Player.objects.filter(game=game_id)
         #players = GameWeek.objects.filter(owner=request.user.id)
-        serializer = GameWeekSerializer2(players, many=True)
+        serializer = GameUsersSerializer2(players, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request, game_id):
         """ Adding a new todo. """
-        serializer = GameWeekSerializer(data=request.DATA)
+        serializer = GameUsersSerializer(data=request.DATA)
         if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
             return Response(serializer.errors, status=
                 status.HTTP_400_BAD_REQUEST)
         else:
             data = serializer.data
-            owner = request.user
-            game1 = Game.objects.get(id=data['game'])
-            week = data['week']
-            inorout = data['inorout']
-            t = GameWeek(owner=owner, game=game1,week=week,inorout=inorout)
+            user = request.user
+            game_id = Game.objects.get(id=data['game_id'])
+            #game_id = data['game_id'] 
+            #week = data['week']
+            gstatus = data['gstatus']
+            t = GameUsers(user=user, game_id=game_id, gstatus=gstatus)
             t.save()
             request.DATA['id'] = t.pk # return id
             return Response(request.DATA, status=status.HTTP_201_CREATED)
