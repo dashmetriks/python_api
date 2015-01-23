@@ -48,13 +48,21 @@ class GameUsersSerializer(serializers.ModelSerializer):
   #  user = UserSerializer(source='owner')
     class Meta:
         model = GameUsers
-        fields = ( 'game_id', 'gstatus') 
+        fields = ( 'gstatus' , 'id' , 'game_id') 
+
+class GameUsersPutSerializer(serializers.ModelSerializer):
+  #  user = UserSerializer(source='owner')
+#    import pdb; pdb.set_trace()
+    class Meta:
+        model = GameUsers
+        #fields = ( 'gstatus' , 'id') 
+        fields = ( 'gstatus' , 'id', 'game_id' ) 
 
 class GameUsersSerializer2(serializers.ModelSerializer):
     users = UserSerializer(source='user')
     class Meta:
         model = GameUsers
-        fields = ('game_id','gstatus', 'user', 'users') 
+        fields = ('id', 'game_id','gstatus', 'user', 'users') 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:

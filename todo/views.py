@@ -19,7 +19,7 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer
 from todo.models import Todo, Game, Player, GameUsers, UserProfile
 
 
@@ -187,39 +187,6 @@ class PlayersView(APIView):
             #sms.send_request()
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
-class GameUsersView(APIView):
-#    permission_classes = (IsAuthenticated,)
-    permission_classes = ()
-
-    def get(self, request, game_id):
-        """ Get all todos """
-        players = GameUsers.objects.filter(game_id=game_id)
-        #players = GameWeek.objects.all()
-        #todos = Player.objects.filter(game=game_id)
-        #players = GameWeek.objects.filter(owner=request.user.id)
-        serializer = GameUsersSerializer2(players, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, game_id):
-        """ Adding a new todo. """
-        serializer = GameUsersSerializer(data=request.DATA)
-        if not serializer.is_valid():
-#            import pdb; pdb.set_trace()
-            return Response(serializer.errors, status=
-                status.HTTP_400_BAD_REQUEST)
-        else:
-            data = serializer.data
-            user = request.user
-            game_id = Game.objects.get(id=data['game_id'])
-            #game_id = data['game_id'] 
-            #week = data['week']
-            gstatus = data['gstatus']
-            t = GameUsers(user=user, game_id=game_id, gstatus=gstatus)
-            t.save()
-            request.DATA['id'] = t.pk # return id
-            return Response(request.DATA, status=status.HTTP_201_CREATED)
-
-
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -258,4 +225,118 @@ class UserProfileView(APIView):
                      done=done, updated=datetime.now())
             t.save()
             return Response(status=status.HTTP_200_OK)
+
+class GameUsersView(APIView):
+#    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
+
+    def get(self, request, game_id):
+        """ Get all todos """
+        players = GameUsers.objects.filter(game_id=game_id)
+        #players = GameWeek.objects.all()
+        #todos = Player.objects.filter(game=game_id)
+        #players = GameWeek.objects.filter(owner=request.user.id)
+        serializer = GameUsersSerializer2(players, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, game_id):
+        #import pdb; pdb.set_trace()
+        """ Adding a new todo. """
+        serializer = GameUsersSerializer(data=request.DATA)
+        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            game_id = Game.objects.get(id=data['game_id'])
+            #game_id = data['game_id'] 
+            #week = data['week']
+            gstatus = data['gstatus']
+            t = GameUsers(user=user, game_id=game_id, gstatus=gstatus)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+    def put(self, request, game_id):
+        #import pdb; pdb.set_trace()
+        """ Adding a new todo. """
+        serializer = GameUsersSerializer(data=request.DATA)
+        import pdb; pdb.set_trace()
+        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            game_id = Game.objects.get(id=data['game_id'])
+            #game_id = data['game_id'] 
+            #week = data['week']
+            gstatus = data['gstatus']
+            gstatus_id = data['gstatus_id']
+            t = GameUsers(id=gstatus_id, user=user, game_id=game_id, gstatus=gstatus)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+class GameStatusView(APIView):
+#    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
+
+    def get(self, request, game_status):
+        """ Get all todos """
+        players = GameUsers.objects.filter(id=game_status)
+        #players = GameWeek.objects.all()
+        #todos = Player.objects.filter(game=game_id)
+        #players = GameWeek.objects.filter(owner=request.user.id)
+        serializer = GameUsersSerializer2(players, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, game_id):
+        #import pdb; pdb.set_trace()
+        """ Adding a new todo. """
+        serializer = GameUsersSerializer(data=request.DATA)
+        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            game_id = Game.objects.get(id=data['game_id'])
+            #game_id = data['game_id'] 
+            #week = data['week']
+            gstatus = data['gstatus']
+            t = GameUsers(user=user, game_id=game_id, gstatus=gstatus)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+    def put(self, request, game_status):
+        #import pdb; pdb.set_trace()
+        """ Adding a new todo. """
+ #       serializer = GameUsersSerializer(data=request.DATA)
+        serializer = GameUsersPutSerializer(data=request.DATA)
+#        import pdb; pdb.set_trace()
+        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+#            gstatus1 = Game.objects.get(id=game_status)
+            #game_id = data['game_id'] 
+            game_id = Game.objects.get(id=data['game_id'])
+            #week = data['week']
+            gstatus = data['gstatus']
+            #gstatus_id = data['gstatus_id']
+            t = GameUsers(id=game_status, user=user, gstatus=gstatus, game_id=game_id)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
 
