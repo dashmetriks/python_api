@@ -286,9 +286,9 @@ class GameStatusView(APIView):
 #    permission_classes = (IsAuthenticated,)
     permission_classes = ()
 
-    def get(self, request, game_status):
+    def get(self, request, gstatus_id):
         """ Get all todos """
-        players = GameUsers.objects.filter(id=game_status)
+        players = GameUsers.objects.filter(id=gstatus_id)
         #players = GameWeek.objects.all()
         #todos = Player.objects.filter(game=game_id)
         #players = GameWeek.objects.filter(owner=request.user.id)
@@ -315,7 +315,7 @@ class GameStatusView(APIView):
             request.DATA['id'] = t.pk # return id
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
-    def put(self, request, game_status):
+    def put(self, request, gstatus_id):
         #import pdb; pdb.set_trace()
         """ Adding a new todo. """
  #       serializer = GameUsersSerializer(data=request.DATA)
@@ -334,7 +334,7 @@ class GameStatusView(APIView):
             #week = data['week']
             gstatus = data['gstatus']
             #gstatus_id = data['gstatus_id']
-            t = GameUsers(id=game_status, user=user, gstatus=gstatus, game_id=game_id)
+            t = GameUsers(id=gstatus_id, user=user, gstatus=gstatus, game_id=game_id)
             t.save()
             request.DATA['id'] = t.pk # return id
             return Response(request.DATA, status=status.HTTP_201_CREATED)
