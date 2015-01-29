@@ -3,12 +3,9 @@ from todo.models import Todo, Game, Player, GameUsers, UserProfile
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
-#    games = serializers.HyperlinkedRelatedField(many=True, view_name='game-detail')
     class Meta:
-        model = User
-        #fields = ('username', 'email', 'groups')
-        fields = ('username',)
-
+       model = User
+       fields = ('id', 'username', 'first_name', 'last_name', 'email' )
 
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:

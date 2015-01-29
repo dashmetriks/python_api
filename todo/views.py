@@ -12,7 +12,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import DjangoObjectPermissions
 from rest_framework.views import APIView
+from .permissions import MyUserPermissions
 
 # Provider OAuth2
 from provider.oauth2.models import Client
@@ -30,12 +33,78 @@ def send_group_mail():
     # print "Hello"
     send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
 
-class UserViewSet(viewsets.ModelViewSet):
+class CurrentUserView(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+class UserDetail(APIView):
+    permission_classes = (MyUserPermissions,)
+    #permission_classes = (IsAuthenticated,)
     """
-    API endpoint that allows users to be viewed or edited.
+    Retrieve, update or delete a user instance.
     """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+
+    def get_object(self, pk):
+        try:
+            obj = User.objects.get(pk=pk)
+            self.check_object_permissions(self.request, obj)
+            return obj 
+        except User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user = UserSerializer(user)
+        return Response(user.data)
+
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializer(user, data=request.DATA)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+    	#users = User.objects.filter(id=request.user.id)
+    	users = User.objects.all()
+    	serializer = UserSerializer(users)
+    	return Response(serializer.data)
+
+
+    def put(self, request):
+        serializer = UserSerializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            #user = request.user
+            #game_id = Game.objects.get(id=data['game_id'])
+            fname = data['first_name']
+            lname = data['last_name']
+            #t = Users(id=request.user.id, user=user, gstatus=gstatus, game_id=game_id)
+            t = User(id=request.user.id, first_name=fname, last_name=lname)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+
+
+   # queryset = User.objects.all()
+   # serializer_class = UserSerializer
 
 
 class RegistrationView(APIView):
