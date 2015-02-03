@@ -29,9 +29,21 @@ from todo.models import Todo, Game, Player, GameUsers, UserProfile
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
-def send_group_mail():
+def send_group_mail(game_id):
     # print "Hello"
-    send_mail('Subject here', 'Here is the message.', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
+    players = GameUsers.objects.filter(game_id=game_id, gstatus="Yes")
+   # serializer = PlayerSerializer2(players, many=True)
+    serializer = GameUsersSerializer2(players, many=True)
+   #     return Response(serializer.data)
+    email_list = []
+    obj = serializer.data
+    for item in obj:
+        email_list.append(item['users']['email'])
+        #print item['users']['email']
+    print email_list 
+#    import pdb; pdb.set_trace()
+    #send_mail('Subject here', 'ododo', 'slatterytom@gmail.com', ['slatterytom@gmail.com', 'patagucci@yahoo.com'], fail_silently=False)
+   # send_mail('Subject here', 'ododo', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
 
 class CurrentUserView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -57,6 +69,8 @@ class UserDetail(APIView):
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
         user = UserSerializer(user)
+        q = UserSerializer(User.objects.get(id=pk).get_profile())
+        import pdb; pdb.set_trace()
         return Response(user.data)
 
     def put(self, request, pk, format=None):
@@ -295,16 +309,21 @@ class UserProfileView(APIView):
             t.save()
             return Response(status=status.HTTP_200_OK)
 
-class GameUsersView(APIView):
-#    permission_classes = (IsAuthenticated,)
+class GameEmailView(APIView):
     permission_classes = ()
 
     def get(self, request, game_id):
         """ Get all todos """
         players = GameUsers.objects.filter(game_id=game_id)
-        #players = GameWeek.objects.all()
-        #todos = Player.objects.filter(game=game_id)
-        #players = GameWeek.objects.filter(owner=request.user.id)
+        serializer = GameUsersSerializer2(players, many=True)
+        return Response(serializer.data)
+
+class GameUsersView(APIView):
+    permission_classes = ()
+
+    def get(self, request, game_id):
+        """ Get all todos """
+        players = GameUsers.objects.filter(game_id=game_id)
         serializer = GameUsersSerializer2(players, many=True)
         return Response(serializer.data)
 
@@ -388,6 +407,7 @@ class GameStatusView(APIView):
         #import pdb; pdb.set_trace()
         """ Adding a new todo. """
  #       serializer = GameUsersSerializer(data=request.DATA)
+        #import pdb; pdb.set_trace()
         serializer = GameUsersPutSerializer(data=request.DATA)
 #        import pdb; pdb.set_trace()
         if not serializer.is_valid():
@@ -406,6 +426,8 @@ class GameStatusView(APIView):
             t = GameUsers(id=gstatus_id, user=user, gstatus=gstatus, game_id=game_id)
             t.save()
             request.DATA['id'] = t.pk # return id
+            #import pdb; pdb.set_trace()
+            send_group_mail(game_id.id)
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
 
@@ -446,6 +468,7 @@ class UserGameStatusView(APIView):
         #import pdb; pdb.set_trace()
         """ Adding a new todo. """
  #       serializer = GameUsersSerializer(data=request.DATA)
+        import pdb; pdb.set_trace()
         serializer = GameUsersPutSerializer(data=request.DATA)
 #        import pdb; pdb.set_trace()
         if not serializer.is_valid():
