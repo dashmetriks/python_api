@@ -22,8 +22,8 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer
-from todo.models import Todo, Game, Player, GameUsers, UserProfile
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer,ProfileSerializer
+from todo.models import Todo, Game, Player, GameUsers, Profile
 
 
 def index(request):
@@ -42,7 +42,7 @@ def send_group_mail(game_id):
         #print item['users']['email']
     print email_list 
 #    import pdb; pdb.set_trace()
-    #send_mail('Subject here', 'ododo', 'slatterytom@gmail.com', ['slatterytom@gmail.com', 'patagucci@yahoo.com'], fail_silently=False)
+    send_mail('Subject here', 'ododo', 'slatterytom@gmail.com', ['slatterytom@gmail.com', 'patagucci@yahoo.com'], fail_silently=False)
    # send_mail('Subject here', 'ododo', 'slatterytom@gmail.com', ['slatterytom@gmail.com'], fail_silently=False)
 
 class CurrentUserView(APIView):
@@ -69,8 +69,8 @@ class UserDetail(APIView):
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
         user = UserSerializer(user)
-        q = UserSerializer(User.objects.get(id=pk).get_profile())
-        import pdb; pdb.set_trace()
+        #q = UserSerializer(User.objects.get(id=pk).get_profile())
+        #import pdb; pdb.set_trace()
         return Response(user.data)
 
     def put(self, request, pk, format=None):
@@ -351,7 +351,7 @@ class GameUsersView(APIView):
         #import pdb; pdb.set_trace()
         """ Adding a new todo. """
         serializer = GameUsersSerializer(data=request.DATA)
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         if not serializer.is_valid():
 #            import pdb; pdb.set_trace()
             return Response(serializer.errors, status=

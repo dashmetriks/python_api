@@ -1,11 +1,47 @@
 from rest_framework import serializers
-from todo.models import Todo, Game, Player, GameUsers, UserProfile
+from todo.models import Todo, Game, Player, GameUsers, Profile
 from django.contrib.auth.models import User
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('city',)
+        #read_only_fields = ('city',)
+#        exclude = ('user',)
+
 class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(required=False)
     class Meta:
        model = User
-       fields = ('id', 'username', 'first_name', 'last_name', 'email' )
+       fields = ('id', 'username', 'first_name', 'last_name', 'email', 'profile' )
+       #fields = ('id', 'username', 'first_name', 'last_name', 'email', )
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create(**validated_data)
+        Profile.objects.create(user=user, **profile_data)
+        return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile')
+        # Unless the application properly enforces that this field is
+        # always set, the follow could raise a `DoesNotExist`, which
+        # would need to be handled.
+        
+        profile = instance.profile
+        instance.username = validated_data.get('username', instance.username)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.email = validated_data.get('email', instance.email)
+        if not instance.profile:
+            Profile.objects.create(user=instance, **profile_data)
+        instance.profile.city = profile_data.get('city', instance.profile.city)
+        #instance.profile.city = validated_data.get('city', instance.profile.city)
+        import pdb; pdb.set_trace()
+        instance.save()
+        profile.save()
+
+        return instance
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,5 +99,5 @@ class GameUsersSerializer2(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfile
+        model = Profile
         fields = ('gender', 'city','phone') 
