@@ -27,7 +27,7 @@ class GameUsers(models.Model):
 #    done = models.BooleanField()
 #    updated = models.DateTimeField(auto_now_add=True)
 
-class UserProfile(models.Model):
+class Profile(models.Model):
         GENDERS = (
             ('male', 'Male'),
             ('female', 'Female')
