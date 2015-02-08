@@ -22,6 +22,7 @@ class GameUsers(models.Model):
     user = models.ForeignKey(User)
     game_id = models.ForeignKey(Game)
     gstatus = models.CharField(max_length=30)
+    email_choice = models.CharField(max_length=10, blank=True, null=True)
     #game = models.CharField(max_length=30)
 #    description = models.CharField(max_length=30)
 #    done = models.BooleanField()
