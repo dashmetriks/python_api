@@ -616,6 +616,7 @@ class FileUploadView(APIView):
             revsys.image =  up_file.name
             revsys.owner =  request.user
             revsys.image.save(up_file.name, django_file, save=True)
+
             return Response(request.DATA, status=status.HTTP_201_CREATED)
     # ...
     # do some stuff with uploaded file
