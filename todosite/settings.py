@@ -35,8 +35,19 @@ REST_FRAMEWORK = {
         'rest_framework.serializers.ModelSerializer',
 
     'DEFAULT_PERMISSION_CLASSES':
-        ('rest_framework.permissions.IsAdminUser',)
+        ('rest_framework.permissions.IsAdminUser',),
+
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.FileUploadParser',
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    )
 }
+
+
+MEDIA_ROOT = '/Users/toms/Downloads/django-todo-master-4/uploads'
+MEDIA_URL = 'uploads/'
 
 # Application definition
 INSTALLED_APPS = (
@@ -105,9 +116,10 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST = 'smtp.gmail.com'
 
-EMAIL_HOST_USER = ''
+EMAIL_HOST_USER = 'dfsafsaym@gmail.com'
 
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'asdfdsfasdfa'
 
 EMAIL_PORT = 587
 
+#AUTH_PROFILE_MODULE = 'todo.UserProfile'

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from PIL import Image
 
 class Todo(models.Model):
     owner = models.ForeignKey(User)
@@ -42,6 +43,37 @@ class Profile(models.Model):
         phone = models.CharField(max_length=20, blank=True, null=True)
         phone_choice = models.CharField(max_length=10, blank=True, null=True)
         email_choice = models.CharField(max_length=10, blank=True, null=True)
+        profile_pic = models.ImageField(upload_to='uploads/', null=True)
+        woot = models.FileField()
 #        def __unicode__(self):
 #            return u'%s profile' % self.user.username
 
+class Content(models.Model):
+        user = models.ForeignKey(User)
+        content_pic = models.ImageField(upload_to='uploads/', null=True)
+        game_id = models.ForeignKey(Game)
+        verbiage = models.CharField(max_length=500)
+        updated = models.DateTimeField(auto_now_add=True)
+
+
+class Company(models.Model):
+    name=models.CharField(max_length=256, default='')
+    user=models.ForeignKey(User)
+    logo=models.ImageField()
+
+    def __unicode__(self):
+        return unicode(self.name)
+
+class CompanyX(models.Model):
+    name=models.CharField(max_length=256, default='')
+    user=models.ForeignKey(User)
+    logo=models.ImageField()
+    profile_pic = models.ImageField(upload_to='uploads/', null=True)
+
+    def __unicode__(self):
+        return unicode(self.name)
+
+class MyPhoto(models.Model):
+    #owner = models.ForeignKey('auth.User', related_name='image')
+    owner = models.ForeignKey(User)
+    image = models.ImageField(upload_to='/Users/toms/Downloads/django-todo-master-4/uploads/', max_length=254)

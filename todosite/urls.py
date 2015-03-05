@@ -8,10 +8,15 @@ urlpatterns = patterns('',
     url(r'^register/$', views.RegistrationView.as_view()),
 
     # Todos endpoint
+
+    url(r'^imageUpload', views.FileUploadView.as_view()),
+    url(r'^api/photo/$', views.PhotoList.as_view(), name='myphoto-list'),
+    url(r'^api/photo/(?P<pk>[0-9]+)/$', views.PhotoDetail.as_view(), name='myphoto-detail'),
     url(r'^mygames/$', views.PlayersView.as_view()),
     url(r'^games/$', views.GamesView.as_view()),
     #url(r'^gameweek/$', views.GameUsersView.as_view()),
     url(r'^gameweek/(?P<game_id>[0-9]*)$', views.GameUsersView.as_view()),
+    url(r'^content/(?P<game_id>[0-9]*)$', views.ContentView.as_view()),
     #url(r'^gamemail/(?P<game_id>[0-9]*)$', views.GameEmailView.as_view()),
     url(r'^gamestatus/(?P<gstatus_id>[0-9]*)$', views.GameStatusView.as_view()),
     url(r'^gamemail/(?P<gstatus_id>[0-9]*)$', views.GameEmailView.as_view()),

@@ -1,6 +1,9 @@
 from datetime import datetime
 from django.core.mail import send_mail
 from nexmomessage import NexmoMessage
+from PIL import Image
+from rest_framework.parsers import FileUploadParser
+from django.core.files import File
 
 
 # Django
@@ -22,8 +25,8 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer,ProfileSerializer, GameEmailPutSerializer
-from todo.models import Todo, Game, Player, GameUsers, Profile
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer,ProfileSerializer, GameEmailPutSerializer, ContentSerializer, PhotoSerializer
+from todo.models import Todo, Game, Player, GameUsers, Profile, Content, MyPhoto
 
 
 def index(request):
@@ -291,7 +294,6 @@ class GameUsersView(APIView):
         return Response(serializer.data)
 
     def post(self, request, game_id):
-        #import pdb; pdb.set_trace()
         """ Adding a new todo. """
         serializer = GameUsersSerializer(data=request.DATA)
         if not serializer.is_valid():
@@ -300,14 +302,10 @@ class GameUsersView(APIView):
                 status.HTTP_400_BAD_REQUEST)
         else:
             data = serializer.data
-    	   # users = User.objects.filter(id=request.user.id)
             user = request.user
             userd = UserSerializer(user)
             email_choice = userd.data['profile']['email_choice']
-            #import pdb; pdb.set_trace()
             game_id = Game.objects.get(id=data['game_id'])
-            #game_id = data['game_id'] 
-            #week = data['week']
             gstatus = data['gstatus']
             t = GameUsers(user=user, game_id=game_id, gstatus=gstatus, email_choice=email_choice)
             t.save()
@@ -315,20 +313,15 @@ class GameUsersView(APIView):
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
     def put(self, request, game_id):
-        #import pdb; pdb.set_trace()
         """ Adding a new todo. """
         serializer = GameUsersSerializer(data=request.DATA)
-        #import pdb; pdb.set_trace()
         if not serializer.is_valid():
-#            import pdb; pdb.set_trace()
             return Response(serializer.errors, status=
                 status.HTTP_400_BAD_REQUEST)
         else:
             data = serializer.data
             user = request.user
             game_id = Game.objects.get(id=data['game_id'])
-            #game_id = data['game_id'] 
-            #week = data['week']
             gstatus = data['gstatus']
             gstatus_id = data['gstatus_id']
             t = GameUsers(id=gstatus_id, user=user, game_id=game_id, gstatus=gstatus)
@@ -477,3 +470,154 @@ class GameEmailView(APIView):
             request.DATA['id'] = t.pk # return id
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
+class ContentView(APIView):
+    permission_classes = ()
+
+    def get(self, request, game_id):
+        """ Get all todos """
+        content = Content.objects.filter(game_id=game_id)
+        serializer = ContentSerializer(content, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, game_id):
+        """ Adding a new todo. """
+        serializer = ContentSerializer(data=request.DATA)
+        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            #userd = UserSerializer(user)
+            #email_choice = userd.data['profile']['email_choice']
+            #game_id = data['game_id']
+            game_id = Game.objects.get(id=data['game_id'])
+            verbiage = data['verbiage']
+            t = Content(user=user, game_id=game_id, verbiage=verbiage)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+    def put(self, request, game_id):
+        """ Adding a new todo. """
+        serializer = GameUsersSerializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            game_id = Game.objects.get(id=data['game_id'])
+            gstatus = data['gstatus']
+            gstatus_id = data['gstatus_id']
+            t = GameUsers(id=gstatus_id, user=user, game_id=game_id, gstatus=gstatus)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+class PhotoList(APIView):
+    permission_classes = ()
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+    def get(self, request, format=None):
+        photo = MyPhoto.objects.all()
+        serializer = PhotoSerializer(photo, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        #serializer = PhotoSerializer(data=request.DATA, files=request.FILES)
+        serializer = PhotoSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            import pdb; pdb.set_trace()
+            return Response(serializer.errors, status=
+                status.HTTP_400_BAD_REQUEST)
+        else:
+            data = serializer.data
+            user = request.user
+            #game_id = Game.objects.get(id=data['game_id'])
+            image = data['image']
+        #    url = data['url']
+            t = Content(user=user, image=image)
+            t.save()
+            request.DATA['id'] = t.pk # return id
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+
+       #serializer = PhotoSerializer(data=request.DATA, files=request.FILES)
+#       if serializer.is_valid():
+#           serializer.save()
+#           return Response(serializer.DATA, status=status.HTTP_201_CREATED)
+#       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#    def pre_save(self, obj):
+#        obj.owner = self.request.user
+
+
+class PhotoDetail(APIView):
+
+    permission_classes = ()
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+    def get_object(self, pk):
+        try:
+            return MyPhoto.objects.get(pk=pk)
+        except MyPhoto.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        photo = self.get_object(pk)
+        serializer = PhotoSerializer(photo)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        photo = self.get_object(pk)
+        serializer = PhotoSerializer(photo, data=request.DATA)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        photo = self.get_object(pk)
+        photo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def pre_save(self, obj):
+        obj.owner = self.request.user
+
+
+class FileUploadView(APIView):
+# parser_classes = (MultiPartParser, FormParser, )
+    permission_classes = ()
+    parser_classes = (FileUploadParser, )
+
+
+    def post(self, request, format=None):
+            #file_obj = request.data['file']
+#            up_file = request.FILES['file']
+        #serializer = PhotoSerializer(data=request.data)
+        #if not serializer.is_valid():
+      #      return Response(serializer.errors, status=
+                #status.HTTP_400_BAD_REQUEST)
+      #  else:
+            up_file = request.FILES['file']
+            with open("/tmp/" + up_file.name, "wb") as f:
+                 f.write(up_file.read())
+            reopen = open("/tmp/" + up_file.name, "rb")
+            django_file = File(reopen)
+            revsys = MyPhoto()
+            revsys.name = "Revolution Systems"
+            user = User.objects.get(pk=1)
+            #user = request.user
+            revsys.image =  up_file.name
+            revsys.owner =  request.user
+            revsys.image.save(up_file.name, django_file, save=True)
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+    # ...
+    # do some stuff with uploaded file
+    # ...
+#        return Response(up_file.name, status.HTTP_201_CREATED)
