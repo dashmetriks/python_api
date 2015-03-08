@@ -199,13 +199,19 @@ class Base64ImageField(serializers.ImageField):
 
         return super(Base64ImageField, self).from_native(data)
 
+class PhotoSerializerxx(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = MyPhoto
+        fields = ('url', 'id', 'image')
+#        owner = serializers.Field(source='owner.username')
+
 class PhotoSerializer(serializers.ModelSerializer):
 #    image = Base64ImageField(
 ##        max_length=None, use_url=True,
 #    )
     class Meta:
         model = MyPhoto
-        fields = ('image',)
-        #fields = ('url', 'id', 'image', 'owner')
+      #  fields = ('image',)
+        fields = ( 'id', 'image', 'verbiage')
         #owner = serializers.Field(source='owner.username')
 

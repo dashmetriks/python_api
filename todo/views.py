@@ -597,6 +597,7 @@ class FileUploadView(APIView):
 
 
     def post(self, request, format=None):
+#            import pdb; pdb.set_trace()
             #file_obj = request.data['file']
 #            up_file = request.FILES['file']
         #serializer = PhotoSerializer(data=request.data)
@@ -604,6 +605,13 @@ class FileUploadView(APIView):
       #      return Response(serializer.errors, status=
                 #status.HTTP_400_BAD_REQUEST)
       #  else:
+#        serializer = PhotoSerializer(data=request.data)
+
+#        if not serializer.is_valid():
+#            import pdb; pdb.set_trace()
+            #return Response(serializer.errors, status=
+                #status.HTTP_400_BAD_REQUEST)
+#        else:
             up_file = request.FILES['file']
             with open("/tmp/" + up_file.name, "wb") as f:
                  f.write(up_file.read())
@@ -612,8 +620,10 @@ class FileUploadView(APIView):
             revsys = MyPhoto()
             revsys.name = "Revolution Systems"
             user = User.objects.get(pk=1)
+            #import pdb; pdb.set_trace()
             #user = request.user
             revsys.image =  up_file.name
+            revsys.verbiage = request.data['verbiage'] 
             revsys.owner =  request.user
             revsys.image.save(up_file.name, django_file, save=True)
 

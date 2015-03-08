@@ -76,4 +76,6 @@ class CompanyX(models.Model):
 class MyPhoto(models.Model):
     #owner = models.ForeignKey('auth.User', related_name='image')
     owner = models.ForeignKey(User)
-    image = models.ImageField(upload_to='/Users/toms/Downloads/django-todo-master-4/uploads/', max_length=254)
+    #image = models.ImageField(upload_to='/Users/toms/Downloads/django-todo-master-4/uploads/', max_length=254)
+    image = models.ImageField()
+    verbiage = models.CharField(max_length=500)
