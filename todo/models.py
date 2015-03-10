@@ -43,8 +43,7 @@ class Profile(models.Model):
         phone = models.CharField(max_length=20, blank=True, null=True)
         phone_choice = models.CharField(max_length=10, blank=True, null=True)
         email_choice = models.CharField(max_length=10, blank=True, null=True)
-        profile_pic = models.ImageField(upload_to='uploads/', null=True)
-        woot = models.FileField()
+        profile_pic = models.ImageField(null=True)
 #        def __unicode__(self):
 #            return u'%s profile' % self.user.username
 

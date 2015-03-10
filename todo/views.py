@@ -2,7 +2,7 @@ from datetime import datetime
 from django.core.mail import send_mail
 from nexmomessage import NexmoMessage
 from PIL import Image
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import FileUploadParser,JSONParser
 from django.core.files import File
 
 
@@ -56,6 +56,7 @@ class CurrentUserView(APIView):
 
 class UserDetail(APIView):
     permission_classes = (MyUserPermissions,)
+    parser_classes = (JSONParser, )
     #permission_classes = (IsAuthenticated,)
     """
     Retrieve, update or delete a user instance.
@@ -77,6 +78,7 @@ class UserDetail(APIView):
         return Response(user.data)
 
     def put(self, request, pk, format=None):
+       # import pdb; pdb.set_trace()
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.DATA)
 #        import pdb; pdb.set_trace()
@@ -531,7 +533,7 @@ class PhotoList(APIView):
         serializer = PhotoSerializer(data=request.data)
 
         if not serializer.is_valid():
-            import pdb; pdb.set_trace()
+           # import pdb; pdb.set_trace()
             return Response(serializer.errors, status=
                 status.HTTP_400_BAD_REQUEST)
         else:
@@ -591,27 +593,11 @@ class PhotoDetail(APIView):
 
 
 class FileUploadView(APIView):
-# parser_classes = (MultiPartParser, FormParser, )
     permission_classes = ()
     parser_classes = (FileUploadParser, )
 
 
     def post(self, request, format=None):
-#            import pdb; pdb.set_trace()
-            #file_obj = request.data['file']
-#            up_file = request.FILES['file']
-        #serializer = PhotoSerializer(data=request.data)
-        #if not serializer.is_valid():
-      #      return Response(serializer.errors, status=
-                #status.HTTP_400_BAD_REQUEST)
-      #  else:
-#        serializer = PhotoSerializer(data=request.data)
-
-#        if not serializer.is_valid():
-#            import pdb; pdb.set_trace()
-            #return Response(serializer.errors, status=
-                #status.HTTP_400_BAD_REQUEST)
-#        else:
             up_file = request.FILES['file']
             with open("/tmp/" + up_file.name, "wb") as f:
                  f.write(up_file.read())
@@ -620,15 +606,35 @@ class FileUploadView(APIView):
             revsys = MyPhoto()
             revsys.name = "Revolution Systems"
             user = User.objects.get(pk=1)
-            #import pdb; pdb.set_trace()
-            #user = request.user
             revsys.image =  up_file.name
             revsys.verbiage = request.data['verbiage'] 
             revsys.owner =  request.user
             revsys.image.save(up_file.name, django_file, save=True)
 
             return Response(request.DATA, status=status.HTTP_201_CREATED)
-    # ...
-    # do some stuff with uploaded file
-    # ...
-#        return Response(up_file.name, status.HTTP_201_CREATED)
+
+
+class uploadProfilePic(APIView):
+#    import pdb; pdb.set_trace()
+    permission_classes = ()
+    parser_classes = (FileUploadParser, )
+
+
+    def post(self, request, format=None):
+            import pdb; pdb.set_trace()
+            up_file = request.FILES['file']
+            with open("/tmp/" + up_file.name, "wb") as f:
+                 f.write(up_file.read())
+            reopen = open("/tmp/" + up_file.name, "rb")
+            django_file = File(reopen)
+            revsys = MyPhoto()
+            revsys.name = "Revolution Systems"
+            user = User.objects.get(pk=1)
+            revsys.image =  up_file.name
+            revsys.verbiage = request.data['verbiage'] 
+            revsys.owner =  request.user
+            revsys.image.save(up_file.name, django_file, save=True)
+
+            return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
