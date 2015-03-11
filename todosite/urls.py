@@ -13,8 +13,8 @@ urlpatterns = patterns('',
     # Todos endpoint
 
     #url(r'^profilepic/(?P<pk>[0-9]+)/$', views.uploadProfilePic.as_view()),
-    url(r'^profilepic', views.FileUploadView.as_view()),
-    url(r'^imageUpload', views.uploadProfilePic.as_view()),
+    url(r'^profilepic', views.uploadProfilePic.as_view()),
+    url(r'^imageUpload', views.FileUploadView.as_view()),
     url(r'^api/photo/$', views.PhotoList.as_view(), name='myphoto-list'),
     url(r'^api/photo/(?P<pk>[0-9]+)/$', views.PhotoDetail.as_view(), name='myphoto-detail'),
     url(r'^mygames/$', views.PlayersView.as_view()),

@@ -8,7 +8,7 @@ from PIL import Image
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('city','phone_choice','email_choice',)
+        fields = ('city','phone_choice','email_choice','profile_pic')
         #read_only_fields = ('city',)
 #        exclude = ('user',)
 

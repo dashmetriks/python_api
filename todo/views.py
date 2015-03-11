@@ -202,6 +202,7 @@ class GamesView(APIView):
             return Response(status=status.HTTP_200_OK)
 
 class PlayersView(APIView):
+    parser_classes = (JSONParser, )
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -287,6 +288,7 @@ class GameEmailView2(APIView):
         return Response(serializer.data)
 
 class GameUsersView(APIView):
+    parser_classes = (JSONParser, )
     permission_classes = ()
 
     def get(self, request, game_id):
@@ -333,6 +335,7 @@ class GameUsersView(APIView):
 
 
 class GameStatusView(APIView):
+    parser_classes = (JSONParser, )
     permission_classes = ()
 
     def get(self, request, gstatus_id):
@@ -375,6 +378,7 @@ class GameStatusView(APIView):
 
 class UserGameStatusView(APIView):
 #    permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser, )
     permission_classes = ()
 
     def get(self, request, game_id):
@@ -433,6 +437,7 @@ class UserGameStatusView(APIView):
 
 
 class GameEmailView(APIView):
+    parser_classes = (JSONParser, )
     permission_classes = ()
 
     def get(self, request, gstatus_id):
@@ -473,6 +478,7 @@ class GameEmailView(APIView):
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
 class ContentView(APIView):
+    parser_classes = (JSONParser, )
     permission_classes = ()
 
     def get(self, request, game_id):
@@ -615,25 +621,27 @@ class FileUploadView(APIView):
 
 
 class uploadProfilePic(APIView):
-#    import pdb; pdb.set_trace()
     permission_classes = ()
     parser_classes = (FileUploadParser, )
 
 
     def post(self, request, format=None):
-            import pdb; pdb.set_trace()
             up_file = request.FILES['file']
             with open("/tmp/" + up_file.name, "wb") as f:
                  f.write(up_file.read())
             reopen = open("/tmp/" + up_file.name, "rb")
             django_file = File(reopen)
-            revsys = MyPhoto()
-            revsys.name = "Revolution Systems"
-            user = User.objects.get(pk=1)
-            revsys.image =  up_file.name
-            revsys.verbiage = request.data['verbiage'] 
-            revsys.owner =  request.user
-            revsys.image.save(up_file.name, django_file, save=True)
+            #revsys.name = "Revolution Systems"
+            #user = User.objects.get(pk=1)
+            #user = request.user
+            revsys = Profile.objects.get(user_id=request.user.id)
+            revsys.profile_pic =  up_file.name
+#            import pdb; pdb.set_trace()
+            #revsys.verbiage = request.data['verbiage'] 
+            #revsys.owner =  request.user
+            #revsys.profile_pic.save(up_file.name, django_file, save=True)
+            revsys.profile_pic.save(up_file.name, django_file, save=True)
+#            revsys.save()
 
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
