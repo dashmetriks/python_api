@@ -35,6 +35,7 @@ class Profile(models.Model):
             ('female', 'Female')
         )
         user = models.OneToOneField(User)
+        nickname = models.CharField(unique=True, max_length=30)
         gender = models.CharField(max_length=20, null=True, blank=True,
                                   choices=GENDERS)
         city = models.CharField(max_length=250, null=True, blank=True)

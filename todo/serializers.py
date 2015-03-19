@@ -8,7 +8,7 @@ from PIL import Image
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('city','phone_choice','email_choice','profile_pic')
+        fields = ('city','phone_choice','email_choice','profile_pic','nickname')
         #read_only_fields = ('city',)
 #        exclude = ('user',)
 
@@ -16,7 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(required=False)
     class Meta:
        model = User
-       fields = ('id', 'username', 'first_name', 'last_name', 'email', 'profile' )
+       fields = ('id', 'username', 'first_name', 'last_name', 'profile' )
+       #fields = ('id', 'username', 'first_name', 'last_name', 'email', 'profile' )
        #fields = ('id', 'username', 'first_name', 'last_name', 'email', )
 
     def create(self, validated_data):
@@ -40,9 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
           user_profile = Profile.objects.get(user=instance)
         except Profile.DoesNotExist:
              Profile.objects.create(user=instance, **profile_data)
-       # if not instance.profile:
         instance.profile.city = profile_data.get('city', instance.profile.city)
-#        import pdb; pdb.set_trace()
+        instance.profile.nickname = profile_data.get('nickname', instance.profile.nickname)
         instance.profile.phone_choice = profile_data.get('phone_choice', instance.profile.phone_choice)
         instance.profile.email_choice = profile_data.get('email_choice', instance.profile.email_choice)
         #instance.profile.city = validated_data.get('city', instance.profile.city)
