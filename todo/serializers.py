@@ -8,7 +8,8 @@ from PIL import Image
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('city','phone_choice','email_choice','profile_pic','nickname')
+        #fields = ('city','phone_choice','email_choice','profile_pic','nickname')
+        fields = ('nickname',)
         #read_only_fields = ('city',)
 #        exclude = ('user',)
 
@@ -34,17 +35,17 @@ class UserSerializer(serializers.ModelSerializer):
         
 #        profile = instance.profile
         instance.username = validated_data.get('username', instance.username)
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.email = validated_data.get('email', instance.email)
+#        instance.first_name = validated_data.get('first_name', instance.first_name)
+#        instance.last_name = validated_data.get('last_name', instance.last_name)
+#        instance.email = validated_data.get('email', instance.email)
         try:
           user_profile = Profile.objects.get(user=instance)
         except Profile.DoesNotExist:
              Profile.objects.create(user=instance, **profile_data)
-        instance.profile.city = profile_data.get('city', instance.profile.city)
+#        instance.profile.city = profile_data.get('city', instance.profile.city)
         instance.profile.nickname = profile_data.get('nickname', instance.profile.nickname)
-        instance.profile.phone_choice = profile_data.get('phone_choice', instance.profile.phone_choice)
-        instance.profile.email_choice = profile_data.get('email_choice', instance.profile.email_choice)
+#        instance.profile.phone_choice = profile_data.get('phone_choice', instance.profile.phone_choice)
+#        instance.profile.email_choice = profile_data.get('email_choice', instance.profile.email_choice)
         #instance.profile.city = validated_data.get('city', instance.profile.city)
 #        import pdb; pdb.set_trace()
         instance.save()
