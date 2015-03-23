@@ -4,6 +4,7 @@ from nexmomessage import NexmoMessage
 from PIL import Image
 from rest_framework.parsers import FileUploadParser,JSONParser
 from django.core.files import File
+from django.shortcuts import get_object_or_404
 
 
 # Django
@@ -54,13 +55,36 @@ class CurrentUserView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+class NickNameCheckView(APIView):
+    permission_classes = (MyUserPermissions,)
+    parser_classes = (JSONParser, )
+
+    def get_object(self, nickname):
+        try:
+           # obj = User.objects.get(pk=pk)
+            import pdb; pdb.set_trace()
+            obj = Profile.objects.get(nickname=nickname)
+            obj = get_object_or_404(Profile,nickname=nickname) 
+           # self.check_object_permissions(self.request, obj)
+            return Response(status=status.HTTP_201_CREATED)
+            #return obj 
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        #    raise Http404
+
+    def get(self, request, nickname, format=None):
+       # user = self.get_object(nickname)
+        obj = get_object_or_404(Profile,nickname=nickname) 
+      #  import pdb; pdb.set_trace()
+        #user = UserSerializer(user)
+        #q = UserSerializer(User.objects.get(id=pk).get_profile())
+        #return Response(user.data)
+        return Response(status=status.HTTP_201_CREATED)
+#        return Response(obj.data)
+
 class UserDetail(APIView):
     permission_classes = (MyUserPermissions,)
     parser_classes = (JSONParser, )
-    #permission_classes = (IsAuthenticated,)
-    """
-    Retrieve, update or delete a user instance.
-    """
 
     def get_object(self, pk):
         try:
@@ -78,7 +102,6 @@ class UserDetail(APIView):
         return Response(user.data)
 
     def put(self, request, pk, format=None):
-       # import pdb; pdb.set_trace()
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.DATA)
 #        import pdb; pdb.set_trace()
