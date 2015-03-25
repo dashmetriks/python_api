@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 # Django
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 
 # REST Framework
 from rest_framework.response import Response
@@ -55,6 +56,34 @@ class CurrentUserView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+class ResetPasswordConfirm(APIView):
+    permission_classes = ()
+    parser_classes = (JSONParser, )
+
+    def put(self, request, uidb64, token, format=None):
+        #import pdb; pdb.set_trace()
+        data = request.DATA
+        new_password = data['new_password']   
+        user = User.objects.get(pk=uidb64)
+        token_generator=default_token_generator
+        token_check = token_generator.check_token(user,token)
+        if user is not None and token_check: 
+        	user.set_password(new_password)
+        	user.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+class ResetPassword(APIView):
+    permission_classes = ()
+    parser_classes = (JSONParser, )
+
+    def get(self, request, email, format=None):
+        user = User.objects.get(username=email)
+        token_generator=default_token_generator
+        new_token = token_generator.make_token(user)
+        send_mail('Subject here', new_token, 'slatterytom@gmail.com',[email] , fail_silently=False)
+   #     obj = get_object_or_404(User,username=email) 
+        return Response(status=status.HTTP_201_CREATED)
+
 class EmailCheckView(APIView):
     permission_classes = (MyUserPermissions,)
     parser_classes = (JSONParser, )
@@ -68,6 +97,7 @@ class NickNameCheckView(APIView):
     parser_classes = (JSONParser, )
 
     def get(self, request, nickname, format=None):
+    #    import pdb; pdb.set_trace()
         obj = get_object_or_404(Profile,nickname=nickname) 
         return Response(status=status.HTTP_201_CREATED)
 
