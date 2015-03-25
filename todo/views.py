@@ -11,6 +11,9 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_bytes
 
 # REST Framework
 from rest_framework.response import Response
@@ -64,7 +67,8 @@ class ResetPasswordConfirm(APIView):
         #import pdb; pdb.set_trace()
         data = request.DATA
         new_password = data['new_password']   
-        user = User.objects.get(pk=uidb64)
+        uid = urlsafe_base64_decode(uidb64)
+        user = User.objects.get(pk=uid)
         token_generator=default_token_generator
         token_check = token_generator.check_token(user,token)
         if user is not None and token_check: 
@@ -80,7 +84,9 @@ class ResetPassword(APIView):
         user = User.objects.get(username=email)
         token_generator=default_token_generator
         new_token = token_generator.make_token(user)
-        send_mail('Subject here', new_token, 'slatterytom@gmail.com',[email] , fail_silently=False)
+        uid_64 = urlsafe_base64_encode(force_bytes(user.pk))
+        body = new_token + " " + uid_64
+        send_mail('Subject here', body, 'slatterytom@gmail.com',[email] , fail_silently=False)
    #     obj = get_object_or_404(User,username=email) 
         return Response(status=status.HTTP_201_CREATED)
 
