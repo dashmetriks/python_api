@@ -64,17 +64,18 @@ class ResetPasswordConfirm(APIView):
     parser_classes = (JSONParser, )
 
     def put(self, request, uidb64, token, format=None):
-        #import pdb; pdb.set_trace()
+#        import pdb; pdb.set_trace()
         data = request.DATA
         new_password = data['new_password']   
         uid = urlsafe_base64_decode(uidb64)
         user = User.objects.get(pk=uid)
         token_generator=default_token_generator
         token_check = token_generator.check_token(user,token)
-        if user is not None and token_check: 
+        if (user is not None and token_check): 
         	user.set_password(new_password)
         	user.save()
-        return Response(status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class ResetPassword(APIView):
     permission_classes = ()
@@ -85,7 +86,9 @@ class ResetPassword(APIView):
         token_generator=default_token_generator
         new_token = token_generator.make_token(user)
         uid_64 = urlsafe_base64_encode(force_bytes(user.pk))
-        body = new_token + " " + uid_64
+        body = "http://localhost:8000/#/passwordreset/" + uid_64 + "/" + new_token  
+        print body
+     #   import pdb; pdb.set_trace()
         send_mail('Subject here', body, 'slatterytom@gmail.com',[email] , fail_silently=False)
    #     obj = get_object_or_404(User,username=email) 
         return Response(status=status.HTTP_201_CREATED)
