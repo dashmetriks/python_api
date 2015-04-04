@@ -14,6 +14,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from django.db.models import Count
 
 # REST Framework
 from rest_framework.response import Response
@@ -30,9 +31,12 @@ from provider.oauth2.models import Client
 
 # Todo App
 from todo.serializers import RegistrationSerializer
-from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer,ProfileSerializer, GameEmailPutSerializer, ContentSerializer, PhotoSerializer
+from todo.serializers import UserSerializer, TodoSerializer, GameSerializer,GamesPlayerSerializer , PlayerSerializer, PlayerSerializer2,GameUsersSerializer,GameUsersSerializer2, UserProfileSerializer, GameUsersPutSerializer,ProfileSerializer, GameEmailPutSerializer, ContentSerializer, PhotoSerializer,MyGamesSerializer
 from todo.models import Todo, Game, Player, GameUsers, Profile, Content, MyPhoto
 
+
+def ValuesQuerySetToDict(vqs):
+    return [item for item in vqs]
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -338,6 +342,20 @@ class GameEmailView2(APIView):
         serializer = GameUsersSerializer2(players, many=True)
         return Response(serializer.data)
 
+class MyGameUsersView(APIView):
+    parser_classes = (JSONParser, )
+    permission_classes = ()
+
+    def get(self, request):
+        """ Get all todos """
+    #    mygames = GameUsers.objects.filter(user=request.user.id).values('game_id')
+   #     players = GameUsers.objects.filter(game_id__in=mygames).values('game_id').annotate(total=Count('user'))
+        players = GameUsers.objects.filter(user=request.user.id)
+        #import pdb; pdb.set_trace()
+        serializer = MyGamesSerializer(players, many=True)
+        return Response(serializer.data)
+        #return Response(players, status=status.HTTP_201_CREATED)
+
 class GameUsersView(APIView):
     parser_classes = (JSONParser, )
     permission_classes = ()
@@ -352,7 +370,6 @@ class GameUsersView(APIView):
         """ Adding a new todo. """
         serializer = GameUsersSerializer(data=request.DATA)
         if not serializer.is_valid():
-#            import pdb; pdb.set_trace()
             return Response(serializer.errors, status=
                 status.HTTP_400_BAD_REQUEST)
         else:
@@ -423,7 +440,7 @@ class GameStatusView(APIView):
             t = GameUsers(id=gstatus_id, user=user, gstatus=gstatus, game_id=game_id,email_choice=email_choice)
             t.save()
             request.DATA['id'] = t.pk # return id
-            send_group_mail(game_id.id)
+            #send_group_mail(game_id.id)
             return Response(request.DATA, status=status.HTTP_201_CREATED)
 
 

@@ -8,8 +8,8 @@ from PIL import Image
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        #fields = ('city','phone_choice','email_choice','profile_pic','nickname')
-        fields = ('nickname',)
+        fields = ('city','phone_choice','email_choice','profile_pic','nickname')
+        #fields = ('nickname',)
         #read_only_fields = ('city',)
 #        exclude = ('user',)
 
@@ -42,12 +42,11 @@ class UserSerializer(serializers.ModelSerializer):
           user_profile = Profile.objects.get(user=instance)
         except Profile.DoesNotExist:
              Profile.objects.create(user=instance, **profile_data)
-#        instance.profile.city = profile_data.get('city', instance.profile.city)
+        instance.profile.city = profile_data.get('city', instance.profile.city)
         instance.profile.nickname = profile_data.get('nickname', instance.profile.nickname)
 #        instance.profile.phone_choice = profile_data.get('phone_choice', instance.profile.phone_choice)
-#        instance.profile.email_choice = profile_data.get('email_choice', instance.profile.email_choice)
+        instance.profile.email_choice = profile_data.get('email_choice', instance.profile.email_choice)
         #instance.profile.city = validated_data.get('city', instance.profile.city)
-#        import pdb; pdb.set_trace()
         instance.save()
         instance.profile.save()
 
@@ -90,14 +89,23 @@ class GamesPlayerSerializer(serializers.ModelSerializer):
 
 class GameUsersSerializer(serializers.ModelSerializer):
   #  user = UserSerializer(source='owner')
+  #  game = GameSerializer( source = 'game_id')
     class Meta:
         model = GameUsers
+        #fields = ( 'gstatus' , 'id' , 'game_id', 'game') 
         fields = ( 'gstatus' , 'id' , 'game_id') 
 
 class GameUsersPutSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameUsers
         fields = ('email_choice', 'gstatus' , 'id', 'game_id' ) 
+
+class MyGamesSerializer(serializers.ModelSerializer):
+    #import pdb; pdb.set_trace()
+    game = GameSerializer( source = 'game_id')
+    class Meta:
+        model = GameUsers
+        fields = ('total','game_id','game' ) 
 
 class GameEmailPutSerializer(serializers.ModelSerializer):
     class Meta:

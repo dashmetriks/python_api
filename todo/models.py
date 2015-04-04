@@ -24,6 +24,7 @@ class GameUsers(models.Model):
     game_id = models.ForeignKey(Game)
     gstatus = models.CharField(max_length=30)
     email_choice = models.CharField(max_length=10, blank=True, null=True)
+    total = models.CharField(max_length=30,null=True)
     #game = models.CharField(max_length=30)
 #    description = models.CharField(max_length=30)
 #    done = models.BooleanField()
@@ -35,7 +36,7 @@ class Profile(models.Model):
             ('female', 'Female')
         )
         user = models.OneToOneField(User)
-        nickname = models.CharField(unique=True, max_length=30)
+        nickname = models.CharField(max_length=30)
         gender = models.CharField(max_length=20, null=True, blank=True,
                                   choices=GENDERS)
         city = models.CharField(max_length=250, null=True, blank=True)
@@ -43,7 +44,7 @@ class Profile(models.Model):
         locale = models.CharField(max_length=10, blank=True, null=True)
         phone = models.CharField(max_length=20, blank=True, null=True)
         phone_choice = models.CharField(max_length=10, blank=True, null=True)
-        email_choice = models.CharField(max_length=10, blank=True, null=True)
+        email_choice = models.CharField(max_length=10, default='YES')
         profile_pic = models.ImageField(null=True)
 #        def __unicode__(self):
 #            return u'%s profile' % self.user.username
